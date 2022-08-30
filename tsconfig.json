@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    // "module": "ES2022",
+    "outDir": "./build",
+    "rootDir": "./src",
+    "strict": true,
+    "noImplicitAny": true,
+    "alwaysStrict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "removeComments": true
+  },
+  "include": ["./src/**/*", "./src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
