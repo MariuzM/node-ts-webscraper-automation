@@ -23,6 +23,10 @@ type TypeGenres = { title: string; value: any };
     modal.click();
   });
 
+  // =================================================================================================
+  // Get all genres for 2020
+  // =================================================================================================
+
   const listGenres: TypeGenres[] = await page.evaluate(() => {
     const newArr: TypeGenres[] = [];
     const arrFromEl = document.querySelectorAll('.categoriesList__category');
@@ -44,17 +48,17 @@ type TypeGenres = { title: string; value: any };
     choices: listGenres,
   });
 
-  await page.evaluate((id) => {
-    document.querySelectorAll('.categoriesList__category')[id].querySelector('a')?.click();
-  }, genreId);
+  const link = await page.$$eval('.categoriesList__category a', (el) =>
+    el.map((a) => a.getAttribute('href'))
+  );
 
-  page.waitForNavigation({ waitUntil: 'networkidle2' });
-
-  // =================================================================================================
-
-  await page.goto('https://www.goodreads.com/choiceawards/best-historical-fiction-books-2020', {
+  await page.goto(`https://www.goodreads.com${link[genreId]}`, {
     waitUntil: 'networkidle2',
   });
+
+  // =================================================================================================
+  // Chose random book
+  // =================================================================================================
 
   const randomBook = await page.evaluate(() => {
     const newArr: string[] = [];
@@ -70,6 +74,8 @@ type TypeGenres = { title: string; value: any };
     return newArr[Math.floor(Math.random() * newArr.length)];
   });
 
+  // =================================================================================================
+  // Navigate to Amazon to the selected book and add to basket
   // =================================================================================================
 
   // const randomBook = 'The Jane Austen Society by Natalie Jenner';
