@@ -1,17 +1,29 @@
-import puppeteer from 'puppeteer';
+import inquirer from 'inquirer';
 import prompts from 'prompts';
+import puppeteer from 'puppeteer';
 
-type TypeGenres = { title: string; value: any };
+import type { TypeGenres } from './types/typesGeneral';
+
+const links = {
+  link1_main: 'https://www.goodreads.com/',
+  link1: 'https://www.goodreads.com/choiceawards/best-books-2020',
+  link2: 'https://www.amazon.com/',
+};
+
+const ui = new inquirer.ui.BottomBar();
 
 (async () => {
+  ui.log.write('Something just happened.');
+  ui.log.write('Almost over, standby!');
+
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
 
   // =================================================================================================
 
-  await page.goto('https://www.goodreads.com/choiceawards/best-books-2020', {
-    waitUntil: 'networkidle2',
-  });
+  await page.goto(links.link1, { waitUntil: 'networkidle2' });
+
+  ui.updateBottomBar('Loading...');
 
   await Promise.all([
     page.click('.gcaButton'),
@@ -48,11 +60,11 @@ type TypeGenres = { title: string; value: any };
     choices: listGenres,
   });
 
-  const link = await page.$$eval('.categoriesList__category a', (el) =>
+  const linkList = await page.$$eval('.categoriesList__category a', (el) =>
     el.map((a) => a.getAttribute('href'))
   );
 
-  await page.goto(`https://www.goodreads.com${link[genreId]}`, {
+  await page.goto(links.link1_main + linkList[genreId], {
     waitUntil: 'networkidle2',
   });
 
@@ -78,9 +90,7 @@ type TypeGenres = { title: string; value: any };
   // Navigate to Amazon to the selected book and add to basket
   // =================================================================================================
 
-  // const randomBook = 'The Jane Austen Society by Natalie Jenner';
-
-  await page.goto('https://www.amazon.com/');
+  await page.goto(links.link2);
 
   await page.evaluate((randomBook) => {
     const input = document.querySelector('.nav-search-field > input') as HTMLInputElement;
